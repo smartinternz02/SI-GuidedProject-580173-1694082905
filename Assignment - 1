@@ -1,0 +1,64 @@
+import pandas as pd
+import numpy as np
+anime=pd.read_csv('/content/anime.csv' ,sep=',')
+classification=pd.read_csv('/content/rating.csv' ,sep=',')
+anime.head()
+classification.head()
+print(anime.shape)
+print(classification.shape)
+print(anime.dtypes)
+print(classification.dtypes)
+print(anime.isna() .sum())
+print(classification.isna() .sum())
+print(anime.loc[anime.duplicated()])
+print(classification.loc[classification.duplicated()])
+anime.rename(columns={'name':'Name','genre':'Genre','type':'Type','episodes':'Episodes','rating':'classification','members':'Members'},inplace=True)
+classification.rename(columns={'rating':'classification'},inplace=True)
+print(anime.columns)
+print(classification.columns)
+classification.drop_duplicates(inplace=True)
+anime['classification'].fillna(anime['classification'].median() , inplace=True)
+anime['Genre'].fillna(anime['Genre'].mode()[0],inplace=True)
+anime['Type'].fillna(anime['Type'].mode()[0],inplace=True)
+anime['classification'].fillna(anime['classification'].median() , inplace=True)
+anime['Genre'].fillna(anime['Genre'].mode()[0],inplace=True)
+anime['Type'].fillna(anime['Type'].mode()[0],inplace=True)
+df=pd.merge(anime,classification,on='anime_id')
+df.rename(columns={'classification_y':'user_classification','classification_x':'classification'},inplace=True)
+df.shape
+df.head()
+anime.isnull().sum()
+from sklearn.preprocessing import StandardScaler
+numerical_columns = ['classification', 'Members']
+
+scaler = StandardScaler()
+
+df[numerical_columns]=scaler.fit_transform(df[numerical_columns])
+from sklearn.preprocessing import LabelEncoder
+categorical_columns=['Name','Genre','Type','user_classification']
+label_encoder=LabelEncoder()
+for col in categorical_columns:
+  df[col]=label_encoder.fit_transform(df[col])
+  Top_anime_members=anime.sort_values (by='Members', ascending=False)
+
+  import plotly.express as px
+fig1=px.bar(x=Top_anime_members['Name'][:20], y=Top_anime_members['Members'][:20],labels={'x':'Name of anime', 'y': 'Total Members'},title='top anime members')
+fig1.show()
+
+Top_anime_classification=anime.sort_values(by='classification', ascending=False )
+
+
+fig=px.bar(x=Top_anime_classification['Name'][:20],y=Top_anime_classification['classification'][:20],
+           labels={'x':'Name of anime','y':'classification'},title='top anime by ranking')
+fig.show()
+fig2=px.bar(
+
+x=anime.value_counts('Type').index, y=anime.value_counts('Type').values,
+
+labels={'x': 'Category', 'y': 'Frequency'},
+title='Category of anime'
+
+)
+
+fig2.show()
+anime.head()
